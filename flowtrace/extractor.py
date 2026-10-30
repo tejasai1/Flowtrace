@@ -1,28 +1,50 @@
 import json
 
-from .models import CONFIDENCE_LEVELS, MECHANISMS, DataFlow
+from .models import CONFIDENCE_LEVELS, DATA_CATEGORIES, MECHANISMS, DataFlow
 
 MAX_PROMPT_CHARS = 400_000  # stay well inside the model's context window
 
 SYSTEM_PROMPT = f"""You are FlowTrace, an expert software architect who maps how data moves between systems.
 
 You will receive every relevant file from ONE repository. Each line is numbered.
-Identify every data flow where data moves between this repository's system and another system.
+Identify every data flow where data moves between this repository's system and another system at runtime.
 
-Rules:
+Rules for finding flows:
 - Only report flows that the code clearly shows. Never guess or invent.
+- Only runtime flows: ignore build-time downloads (Dockerfile installs, package fetches), tests and sample data.
+- Ignore health checks and liveness probes.
 - Every flow needs evidence: the exact file path and line numbers, copied from the numbered listing.
-- Call this repository's own system by the repository name you are given.
-- Name other systems as the code or config names them (service name, host, database name, or environment variable).
+  Cite each code location only once per flow.
 - Include outgoing flows (this system sends data) and incoming flows (this system receives data, e.g. an API endpoint).
   For incoming flows where the caller is unknown, use "unknown client" as the source.
 - Do not report function calls inside the same system.
-- mechanism must be one of: {", ".join(MECHANISMS)}
-- confidence must be one of: {", ".join(CONFIDENCE_LEVELS)}
+
+Rules for naming systems:
+- Call this repository's own system by the repository name you are given.
+- Name other systems by their short service, host or product name, e.g. "catalogue", "mysql", "rabbitmq",
+  "PayPal", "Instana monitoring".
+- Never use a full URL, a code function name or an environment variable as a name
+  when the real system is clear from the code.
+
+Rules for describing the data:
+- "data": a short plain-English summary of WHAT data moves, at most 8 words.
+  Describe the data itself, not the endpoint or the code.
+- "fields": the main data items sent, e.g. ["order_id", "total", "email"].
+- "category": exactly one of: {", ".join(DATA_CATEGORIES)}
+  personal = names, emails, addresses, user ids; payment = card or billing data;
+  credentials = passwords, tokens, keys; business = orders, products, carts, ratings;
+  operational = metrics, logs, monitoring events.
+- If a flow carries several kinds of data, use the most sensitive category.
+
+BAD data description: "PUT /api/rate/{{sku}}/{{score}} rating submission request"
+GOOD data description: "data": "Product ratings", "fields": ["sku", "score"], "category": "business"
+
+mechanism must be one of: {", ".join(MECHANISMS)}
+confidence must be one of: {", ".join(CONFIDENCE_LEVELS)}
 
 Respond with JSON only, in exactly this shape:
-{{"flows": [{{"source": "...", "destination": "...", "data": "what data is sent",
-  "mechanism": "...", "confidence": "...",
+{{"flows": [{{"source": "...", "destination": "...", "data": "short summary",
+  "fields": ["..."], "category": "...", "mechanism": "...", "confidence": "...",
   "evidence": [{{"file": "path/in/repo", "start_line": 1, "end_line": 3, "snippet": "..."}}]}}]}}
 If there are no data flows, respond with {{"flows": []}}."""
 

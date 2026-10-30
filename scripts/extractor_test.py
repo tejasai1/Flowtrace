@@ -15,13 +15,16 @@ fake_reply = json.dumps({"flows": [
     {"source": "flowtrace", "destination": "Meta Model API",
      "data": "prompts and repository code", "mechanism": "external_service",
      "confidence": "high",
+     "category": "business",
      "evidence": [{"file": "flowtrace/providers/openai_compatible.py",
                    "start_line": 20, "end_line": 24, "snippet": "(model's version)"}]},
     {"source": "flowtrace", "destination": "billing-db", "data": "invoices",
      "mechanism": "database", "confidence": "high",
+     "category": "business",
      "evidence": [{"file": "app/billing.py", "start_line": 1, "end_line": 2, "snippet": "..."}]},
     {"source": "flowtrace", "destination": "audit-log", "data": "events",
      "mechanism": "file", "confidence": "low",
+     "category": "business",
      "evidence": [{"file": "config.yaml", "start_line": 500, "end_line": 505, "snippet": "..."}]},
 ]})
 

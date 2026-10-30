@@ -7,10 +7,12 @@ reply = {"flows": [
     {"source": "flowtrace", "destination": "Meta Model API",
      "data": "prompts and repository code", "mechanism": "external_service",
      "confidence": "high",
+     "category": "business",
      "evidence": [{"file": "flowtrace/providers/openai_compatible.py",
                    "start_line": 20, "end_line": 24, "snippet": ""}]},
     {"source": "flowtrace", "destination": "secret-db", "data": "everything",
      "mechanism": "database", "confidence": "high",
+     "category": "business",
      "evidence": [{"file": "db/secret.py", "start_line": 1, "end_line": 5, "snippet": ""}]},
 ]}
 

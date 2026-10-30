@@ -9,6 +9,7 @@ good = {
     "data": "order id and total amount",
     "mechanism": "http_api",
     "confidence": "high",
+    "category": "business", "fields": ["order_id", "total"],
     "evidence": [{"file": "app/checkout.py", "start_line": 42,
                   "end_line": 45, "snippet": "requests.post(PAYMENTS_URL, ...)"}],
 }
