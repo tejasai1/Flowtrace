@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Folders that never contain useful source code.
 SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__",
-             "dist", "build", ".idea", ".vscode"}
+             "dist", "build", ".idea", ".vscode", "output"}
 
 CODE_EXTENSIONS = {".py": "python", ".js": "javascript", ".ts": "typescript",
                    ".java": "java", ".go": "go", ".rb": "ruby", ".php": "php",
