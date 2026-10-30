@@ -7,23 +7,29 @@ from .graph import build_graph
 from .reader import read_repository
 
 
-def find_repositories(workspace):
-    """Every non-hidden folder inside the workspace is treated as one repository."""
+def find_repositories(workspace, only=None):
+    """Every non-hidden folder inside the workspace is one repository.
+    If 'only' is given, analyze just those folders."""
     root = Path(workspace).resolve()
     if not root.is_dir():
         raise FileNotFoundError(f"Workspace folder not found: {root}")
     repos = [p for p in sorted(root.iterdir())
              if p.is_dir() and not p.name.startswith(".")]
+    if only:
+        missing = set(only) - {p.name for p in repos}
+        if missing:
+            raise ValueError(f"Not found in workspace: {sorted(missing)}")
+        repos = [p for p in repos if p.name in set(only)]
     if not repos:
         raise ValueError(f"No repository folders found in {root}")
     return repos
 
 
-def run(workspace, provider, output_dir="output", aliases=None, log=print):
+def run(workspace, provider, output_dir="output", aliases=None, log=print, only=None):
     """Read every repository, extract and verify flows, build the map, save results."""
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
-    repos = find_repositories(workspace)
+    repos = find_repositories(workspace, only)
     all_flows, report = [], {}
 
     for repo_path in repos:

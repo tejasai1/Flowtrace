@@ -10,7 +10,8 @@ CODE_EXTENSIONS = {".py": "python", ".js": "javascript", ".ts": "typescript",
                    ".java": "java", ".go": "go", ".rb": "ruby", ".php": "php",
                    ".cs": "csharp"}
 CONFIG_EXTENSIONS = {".yaml": "yaml", ".yml": "yaml", ".json": "json",
-                     ".toml": "toml", ".ini": "ini"}
+                     ".toml": "toml", ".ini": "ini", ".conf": "conf",
+                     ".properties": "properties"}
 CONFIG_NAMES = {"dockerfile": "dockerfile", ".env.example": "env",
                 "requirements.txt": "requirements"}
 
