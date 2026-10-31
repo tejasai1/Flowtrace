@@ -57,13 +57,16 @@ def build_graph(flows, repo_names, aliases=None):
             continue  # a system talking to itself is not a data flow
         edge = edges.setdefault((src, dst, f.mechanism), {
             "source": src, "destination": dst, "mechanism": f.mechanism,
-            "data": [], "fields": [], "category": "", "sensitive": False,
-            "repos": [], "evidence": []})
+            "data": [], "fields": [], "returns": [], "category": "",
+            "sensitive": False, "repos": [], "evidence": []})
         if f.data and f.data not in edge["data"]:
             edge["data"].append(f.data)
         for name in f.fields:
             if name not in edge["fields"]:
                 edge["fields"].append(name)
+        for name in f.returns:
+            if name not in edge["returns"]:
+                edge["returns"].append(name)
         if CATEGORY_RANK.get(f.category, 0) > CATEGORY_RANK.get(edge["category"], 0):
             edge["category"] = f.category
         edge["sensitive"] = edge["sensitive"] or f.sensitive

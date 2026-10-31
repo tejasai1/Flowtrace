@@ -8,7 +8,7 @@ from flowtrace.providers import get_provider
 WORKSPACE = os.path.expanduser("~/flowtrace-demos/robot-shop")
 SERVICES = ["cart", "catalogue", "dispatch", "payment",
             "ratings", "shipping", "user", "web"]
-OUTPUT = "output/robot_shop_v2"
+OUTPUT = "output/robot_shop_v3"
 
 provider = get_provider()
 print(f"Analyzing {len(SERVICES)} Robot Shop services with {provider.model} ...\n")

@@ -18,15 +18,16 @@ class Evidence:
 
 @dataclass
 class DataFlow:
-    """One movement of data from a source system to a destination system."""
+    """One exchange, pointing from the system that starts it to the system it calls."""
     repo: str
     source: str
     destination: str
-    data: str                                    # short summary of what moves
+    data: str                                    # short summary of the exchange
     mechanism: str
     confidence: str
     category: str = ""                           # one of DATA_CATEGORIES
-    fields: list = field(default_factory=list)   # main data items sent
+    fields: list = field(default_factory=list)   # data items the source SENDS
+    returns: list = field(default_factory=list)  # data items RETURNED to the source
     evidence: list = field(default_factory=list)
 
     @property
@@ -60,9 +61,6 @@ class DataFlow:
     @classmethod
     def from_dict(cls, d, repo):
         """Build a DataFlow from the model's JSON output."""
-        fields = d.get("fields", [])
-        if isinstance(fields, str):  # tolerate a single string instead of a list
-            fields = [fields]
         return cls(
             repo=repo,
             source=d.get("source", ""),
@@ -71,6 +69,14 @@ class DataFlow:
             mechanism=d.get("mechanism", ""),
             confidence=d.get("confidence", ""),
             category=d.get("category", ""),
-            fields=[str(f) for f in fields],
+            fields=_as_list(d.get("fields", [])),
+            returns=_as_list(d.get("returns", [])),
             evidence=[Evidence(**e) for e in d.get("evidence", [])],
         )
+
+
+def _as_list(value):
+    """Tolerate a single string instead of a list."""
+    if isinstance(value, str):
+        value = [value] if value else []
+    return [str(v) for v in value]

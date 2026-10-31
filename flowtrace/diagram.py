@@ -77,7 +77,8 @@ function show(e) {
   const category = e.category || "uncategorized";
   add("span", e.sensitive ? "Sensitive: " + category : category,
       e.sensitive ? "tag sensitive" : "tag");
-  if ((e.fields || []).length) add("p", "Fields: " + e.fields.join(", "));
+  if ((e.fields || []).length) add("p", "Sends: " + e.fields.join(", "));
+  if ((e.returns || []).length) add("p", "Returns: " + e.returns.join(", "));
   add("p", "Mechanism: " + e.mechanism);
   add("p", "Found in: " + e.repos.join(", "));
   e.evidence.forEach(ev => {
