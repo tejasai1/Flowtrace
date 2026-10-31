@@ -87,11 +87,22 @@ function show(e) {
   });
 }
 
-new vis.Network(document.getElementById("graph"), {nodes, edges}, {
-  layout: {hierarchical: {direction: "LR", sortMethod: "directed", levelSeparation: 220}},
-  physics: false,
-  edges: {smooth: {type: "cubicBezier"}}
-}).on("click", params => {
+const network = new vis.Network(document.getElementById("graph"), {nodes, edges}, {
+  layout: {randomSeed: 7, improvedLayout: true},
+  physics: {
+    solver: "forceAtlas2Based",
+    forceAtlas2Based: {gravitationalConstant: -90, springLength: 170,
+                       springConstant: 0.04, avoidOverlap: 0.8},
+    stabilization: {iterations: 500}
+  },
+  edges: {smooth: {type: "continuous"}}
+});
+// Once the layout settles, freeze it and fit everything on screen.
+network.once("stabilizationIterationsDone", () => {
+  network.setOptions({physics: false});
+  network.fit();
+});
+network.on("click", params => {
   if (params.edges.length && !params.nodes.length) show(graph.edges[params.edges[0]]);
 });
 </script>

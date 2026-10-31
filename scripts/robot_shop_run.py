@@ -8,19 +8,23 @@ from flowtrace.providers import get_provider
 WORKSPACE = os.path.expanduser("~/flowtrace-demos/robot-shop")
 SERVICES = ["cart", "catalogue", "dispatch", "payment",
             "ratings", "shipping", "user", "web"]
+OUTPUT = "output/robot_shop_v2"
 
 provider = get_provider()
 print(f"Analyzing {len(SERVICES)} Robot Shop services with {provider.model} ...\n")
-graph, report = run(WORKSPACE, provider, output_dir="output/robot_shop", only=SERVICES)
+graph, report = run(WORKSPACE, provider, output_dir=OUTPUT, only=SERVICES)
 
 labels = {n["id"]: n["label"] for n in graph["nodes"]}
 print(f"\nSystems found ({len(graph['nodes'])}):")
 for n in graph["nodes"]:
-    print(f"  {n['label']:20} {'[service]' if n['is_repo'] else '[external]'}")
+    print(f"  {n['label']:22} {'[service]' if n['is_repo'] else '[external]'}")
 
-print(f"\nData flows found ({len(graph['edges'])}):")
+sensitive = [e for e in graph["edges"] if e["sensitive"]]
+print(f"\nData flows found ({len(graph['edges'])}, {len(sensitive)} sensitive):")
 for e in graph["edges"]:
-    print(f"  {labels[e['source']]} -> {labels[e['destination']]} [{e['mechanism']}]")
+    mark = "!!" if e["sensitive"] else "  "
+    print(f" {mark} {labels[e['source']]} -> {labels[e['destination']]} "
+          f"[{e['category'] or '?'}] {'; '.join(e['data'])}")
 
 for repo, info in report.items():
     for item in info["rejected"]:
