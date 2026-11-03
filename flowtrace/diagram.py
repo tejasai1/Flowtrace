@@ -121,6 +121,19 @@ function showNode(n) {
            " in the service's own libraries)", "summary");
   add("p", "Critical " + c.Critical + " \\u00b7 High " + c.High + " \\u00b7 Medium " +
            c.Medium + " \\u00b7 Low " + c.Low);
+     if (n.impact) {
+    const im = n.impact;
+    add("h2", "Impact assessment (Muse Spark)");
+    add("span", "Risk: " + im.risk_level,
+        im.risk_level === "critical" || im.risk_level === "high" ? "tag sensitive" : "tag");
+    add("p", im.summary || "");
+    if ((im.data_at_risk || []).length) add("p", "Data at risk: " + im.data_at_risk.join(", "));
+    if ((im.exposed_systems || []).length)
+      add("p", "Reachable through its data flows: " + im.exposed_systems.join(", "));
+    (im.recommendations || []).forEach((r, i) => add("p", (i + 1) + ". " + r));
+    if ((im.problems || []).length)
+      add("p", "Verification warning: " + im.problems.join("; "), "tag");
+  }        
 
   const sensitive = graph.edges.filter(e => e.sensitive &&
                                        (e.source === n.id || e.destination === n.id));
