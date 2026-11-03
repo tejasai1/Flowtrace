@@ -57,3 +57,21 @@ def summarize(report, top=5):
 
     return {"unique_vulnerabilities": len(vulns), "by_severity": counts,
             "app_level": sum(e["app_level"] for e in vulns.values()), "top": serious}
+def attach_vulnerabilities(graph, images, cache_dir="output/vulns", log=print):
+    """Scan each service's container image and store the summary on its box in the graph.
+    'images' maps a service name to its image, e.g. {"cart": "robotshop/rs-cart:2.1.0"}."""
+    for node in graph["nodes"]:
+        image = images.get(node["label"])
+        if not image:
+            continue
+        log(f"[{node['label']}] scanning {image} ...")
+        try:
+            report = run_grype(f"registry:{image}",
+                               cache_file=f"{cache_dir}/{node['label']}.json")
+        except RuntimeError as err:
+            log(f"[{node['label']}] scan failed: {err}")
+            continue
+        node["vulns"] = summarize(report)
+        c = node["vulns"]["by_severity"]
+        log(f"[{node['label']}] {c['Critical']} critical, {c['High']} high")
+    return graph
